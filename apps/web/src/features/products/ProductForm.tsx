@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState, type FormEvent } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { createProduct } from '../../lib/api'
 
 function ProductForm() {
   const [name, setName] = useState('')
@@ -6,36 +8,32 @@ function ProductForm() {
   const [category, setCategory] = useState('')
   const [submittedName, setSubmittedName] = useState('')
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault()
+  const queryClient = useQueryClient()
 
-  const response = await fetch('http://localhost:3000/api/products', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      name,
-      price,
-      category,
-    }),
-  })
-
-  const data = await response.json()
-
-  console.log(data)
-
-  setSubmittedName(name)
+  const createProductMutation = useMutation({
+    mutationFn: createProduct,
+    onSuccess: async (data) => {
+  setSubmittedName(data.product.name)
   setName('')
   setPrice('')
   setCategory('')
-}
 
-  useEffect(() => {
-  document.title = submittedName
-    ? `Added: ${submittedName}`
-    : 'Workshop'
-}, [submittedName])
+  await queryClient.invalidateQueries({
+    queryKey: ['products'],
+  })
+},
+  })
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setSubmittedName('')
+
+    createProductMutation.mutate({
+      name: name.trim(),
+      price: Number(price),
+      category,
+    })
+  }
 
   return (
     <section>
@@ -48,6 +46,7 @@ function ProductForm() {
             type="text"
             value={name}
             onChange={(event) => setName(event.target.value)}
+            required
           />
         </label>
 
@@ -55,8 +54,11 @@ function ProductForm() {
           Price
           <input
             type="number"
+            min="0"
+            step="0.01"
             value={price}
             onChange={(event) => setPrice(event.target.value)}
+            required
           />
         </label>
 
@@ -65,6 +67,7 @@ function ProductForm() {
           <select
             value={category}
             onChange={(event) => setCategory(event.target.value)}
+            required
           >
             <option value="">Select a category</option>
             <option value="electronics">Electronics</option>
@@ -73,10 +76,18 @@ function ProductForm() {
           </select>
         </label>
 
-        <button type="submit">Add product</button>
+        <button type="submit" disabled={createProductMutation.isPending}>
+          {createProductMutation.isPending ? 'Adding…' : 'Add product'}
+        </button>
       </form>
 
       {submittedName && <p>Added: {submittedName}</p>}
+
+      {createProductMutation.isError && (
+        <p role="alert">
+          Error: {createProductMutation.error.message}
+        </p>
+      )}
     </section>
   )
 }
