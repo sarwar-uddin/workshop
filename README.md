@@ -17,6 +17,7 @@ cp .env.example .env          # local config (never committed)
 docker compose up -d db       # PostgreSQL 18 on :5432
 pnpm install
 pnpm --filter @workshop/api db:migrate   # apply migrations in apps/api/drizzle/
+pnpm --filter @workshop/api db:seed      # demo data (safe to re-run)
 pnpm --filter @workshop/api dev          # API on :3000
 pnpm --filter @workshop/web dev          # web on :5173
 ```
