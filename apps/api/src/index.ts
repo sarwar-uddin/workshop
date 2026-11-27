@@ -2,7 +2,11 @@ import express from "express";
 import { env } from "./config/env.js";
 import { errorHandler } from "./errors/errorHandler.js";
 import { randomUUID } from "node:crypto";
+import { productRouter } from "./products/product.routes.js";
 
+// TEMPORARY (until issue #9): POST still writes to this in-memory array, so
+// products created through the form do not appear in GET, which now reads
+// from Postgres. #9 moves create into the repository and removes all of this.
 type Product = {
   id: string;
   name: string;
@@ -16,9 +20,7 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/api/products", (_req, res) => {
-  res.json({ products });
-});
+app.use("/api/products", productRouter);
 
 app.post("/api/products", (req, res) => {
   const { name, price, category } = req.body;
