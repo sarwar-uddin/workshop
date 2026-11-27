@@ -6,8 +6,13 @@ const product: Product = {
   id: "prod_001",
   name: "Leather Card Holder",
   sku: "LCH-001",
-  price: 1200,
+  description: null,
+  price: "1200.00",
+  stockQuantity: 5,
   status,
+  category: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 console.log(product);

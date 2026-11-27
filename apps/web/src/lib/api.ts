@@ -27,11 +27,19 @@ export async function createProduct(
   return response.json() as Promise<CreateProductResponse>
 }
 
+// Mirrors the API's Product. Dates arrive as ISO strings, since JSON has no
+// Date type.
 export type Product = {
   id: string;
+  sku: string;
   name: string;
-  price: number;
-  category: string;
+  description: string | null;
+  price: string; // exact decimal, e.g. "1850.00"
+  stockQuantity: number;
+  status: "active" | "archived";
+  category: { id: string; name: string } | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export async function getProducts(): Promise<Product[]> {

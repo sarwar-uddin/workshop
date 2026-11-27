@@ -20,6 +20,10 @@ export const errorHandler: ErrorRequestHandler = (
     return;
   }
 
+  // Unexpected error: the client gets a generic message (internal details can
+  // leak information), so the real error must go to the server log.
+  console.error(error);
+
   const body: ApiErrorBody = {
     error: {
       code: "INTERNAL_SERVER_ERROR",
