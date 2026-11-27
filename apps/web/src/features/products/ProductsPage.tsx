@@ -31,7 +31,9 @@ function ProductsPage() {
         <ul>
           {productsQuery.data.map((product) => (
             <li key={product.id}>
-              {product.name} — {product.price.toFixed(2)} — {product.category}
+              {product.name} ({product.sku}) — ৳{product.price} —{' '}
+              {product.category?.name ?? 'Uncategorised'} — {product.stockQuantity}{' '}
+              in stock{product.status === 'archived' && ' [archived]'}
             </li>
           ))}
         </ul>
