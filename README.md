@@ -4,6 +4,20 @@ A small-business inventory and order management system: products, customers, ord
 
 > **Status: in development, milestone M4 (database + domain).** Products and categories run on PostgreSQL end to end. Customers, orders, inventory, auth and deployment are still to come. See [docs/progress.md](docs/progress.md).
 
+## About
+
+Small workshops and shops tend to track stock in a notebook or a spreadsheet, so the numbers drift: nobody can say why a count changed, or which order used up the last of something. Workshop is a full-stack app built to keep those numbers honest.
+
+The design choices that matter:
+
+- **Stock is backed by a ledger.** `stockQuantity` can't be written through the product API. From the inventory milestone on, every change also records a stock movement in the same transaction, so each count can be explained.
+- **Money is never a float.** Prices are `numeric(12,2)` in PostgreSQL and strings end to end.
+- **Rules live on the server, with the database as backstop.** Zod rejects bad or unknown input, and PostgreSQL constraints (case-insensitive unique SKUs, restricted foreign keys) catch anything that slips through.
+- **Archive, don't delete.** Products keep their history; IDs are UUIDv7.
+- **Every decision is written down.** The reasoning lives in [docs/decisions.md](docs/decisions.md).
+
+It's being built one vertical slice at a time, each on its own branch with conventional commits.
+
 ## Stack
 
 | Layer    | Tools |
@@ -115,3 +129,9 @@ Notes:
   | `PRODUCT_NOT_FOUND` | 404 | No product with that id (a malformed id also gets 404) |
   | `SKU_TAKEN` | 409 | Another product already has that SKU, in any letter case |
   | `INTERNAL_SERVER_ERROR` | 500 | Anything unexpected; the real error is logged on the server |
+
+## License
+
+Copyright © 2026 Sarwar Uddin
+
+Workshop is free software: you can redistribute it and/or modify it under the terms of the [GNU Affero General Public License](LICENSE) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. If you run a modified version on a server, the AGPL requires you to offer its source code to the users who interact with it.

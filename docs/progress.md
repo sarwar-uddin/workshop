@@ -14,7 +14,11 @@ Tracks the build against the project's milestones and backlog. Hashes point at t
 | M5 Express API | Partly done: products API, validation, error contract. Pagination/filtering still to do |
 | M6 Auth | Not started |
 | M7 Products + customers | Products API done; customers not started; product UI to be rebuilt (items 10–11) |
-| M8–M12 | Not started |
+| M8 Orders + transactions | Not started |
+| M9 Inventory + dashboard | Not started |
+| M10 Testing | Not started |
+| M11 Operations + deployment | Not started |
+| M12 Delivery + release | Not started |
 
 ## Backlog status
 
@@ -30,7 +34,7 @@ Tracks the build against the project's milestones and backlog. Hashes point at t
 - [ ] 10. Product list UI: a proper table, status/stock display, archived filter
 - [ ] 11. Product form UI: React Hook Form + Zod, inline field errors, edit mode
 - [ ] 12–13. Customers API + UI
-- [ ] 14–37. See the Workshop guide
+- [ ] 14–37. Orders, inventory adjustments, dashboard, auth, tests, deployment and release
 
 ## Known gaps
 
