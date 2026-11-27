@@ -13,10 +13,21 @@ export const errorHandler: ErrorRequestHandler = (
       error: {
         code: error.code,
         message: error.message,
+        ...(error.details && { details: error.details }),
       },
     };
 
     res.status(error.statusCode).json(body);
+    return;
+  }
+
+  // express.json() rejects a body that is not valid JSON. That is the
+  // client's mistake, not a server failure.
+  if (error?.type === "entity.parse.failed") {
+    const body: ApiErrorBody = {
+      error: { code: "INVALID_JSON", message: "Request body is not valid JSON" },
+    };
+    res.status(400).json(body);
     return;
   }
 
