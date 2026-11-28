@@ -1,0 +1,10 @@
+{
+  // Type-checks app code and tests together. tsconfig.json stays limited to
+  // src/ so `pnpm build` never compiles tests into dist/.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "."
+  },
+  "include": ["src", "test", "vitest.config.ts"]
+}
