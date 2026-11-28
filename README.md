@@ -52,12 +52,15 @@ apps/
   api/
     drizzle/              generated SQL migrations (committed)
     src/
+      app.ts              builds the Express app (routes, error handler)
+      index.ts            starts it: app.listen()
       config/env.ts       validated environment variables
       db/                 schema, client (pool), seed, pg error helpers
       errors/             AppError, error contract, error handler
       validation/         parseInput(): Zod → 400 with field details
       products/           routes, schemas, service, repository, types
       categories/         read-only category list
+    test/                 Vitest + Supertest API tests, setup, factories
   web/
     src/
       app/                App, QueryClient
@@ -81,7 +84,23 @@ pnpm --filter @workshop/api dev          # API on :3000
 pnpm --filter @workshop/web dev          # web on :5173
 ```
 
-Typecheck: `pnpm --filter @workshop/api typecheck` and `pnpm --filter @workshop/web exec tsc -b`.
+Typecheck: `pnpm --filter @workshop/api typecheck` (includes tests) and `pnpm --filter @workshop/web exec tsc -b`.
+
+### Tests
+
+```sh
+pnpm --filter @workshop/api test          # run once
+pnpm --filter @workshop/api test:watch    # re-run on save
+```
+
+API tests use Vitest + Supertest and run against a real PostgreSQL database, `workshop_test` (`TEST_DATABASE_URL` in `.env`), never the dev one:
+
+- Before the run, the database is created if it's missing, and the real migrations are applied to it.
+- Every table is truncated before each test. Each test inserts the rows it needs, then calls the API over HTTP.
+- Test files run one at a time, because they share the database.
+- Tests refuse to start if the database name doesn't end in `_test`.
+
+The Postgres container must be running (`docker compose up -d db`).
 
 ### Database workflow
 
@@ -97,6 +116,8 @@ pnpm --filter @workshop/api db:studio                           # optional: brow
 Commit the schema change and its migration together. Never edit a migration that has already been applied anywhere; add a new one instead.
 
 ## API
+
+`GET /health` returns `{ "status": "ok" }` (liveness only, no DB check).
 
 All responses are JSON. Errors share one shape:
 

@@ -49,3 +49,16 @@ A short record of choices that would be non-obvious to a new reader (or to futur
 
 **Decision:** `pool.on("error", …)` logs the error.
 **Why:** found while testing. When Postgres drops an *idle* pooled connection, the pool emits `'error'`, and with no listener Node crashes the whole API. Now a DB outage returns 500s and the API recovers when the DB comes back.
+
+## 2026-11-28: API tests hit a real PostgreSQL test database
+
+**Decision:** Vitest + Supertest against `workshop_test` on the same Postgres server, migrated with the real migrations, with every table truncated before each test. No mocked database.
+**Why:** most of the API's guarantees live in Postgres: the case-insensitive unique SKU, the FK, CHECK constraints, numeric money coming back as `"1850.00"`. A mocked DB would test the mocks. Running the real migrations also catches a broken migration.
+**Trade-off:** test files run one at a time (shared database), and Docker must be up. That's fine at this size. Revisit with one database per worker if the suite gets slow.
+**Safety:** the test setup refuses any database whose name doesn't end in `_test`, because it wipes every table.
+
+## 2026-11-28: `app.ts` builds the app, `index.ts` listens
+
+**Decision:** split the Express app from `app.listen()`.
+**Why:** Supertest needs the app without a bound port. It's also where a future graceful-shutdown handler goes, without touching routes.
+
